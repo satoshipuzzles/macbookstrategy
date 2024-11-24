@@ -94,17 +94,30 @@
     const apiBaseUrl = '/api/options'; // Proxy API endpoint
 
     // Fetch live options data via the proxy API
-    async function fetchOptionsData(symbol) {
-      try {
-        const response = await fetch(`${apiBaseUrl}?symbol=${symbol}`);
-        const data = await response.json();
-        return data.optionChain.result[0].options[0];
-      } catch (error) {
-        console.error('Error fetching options data:', error);
-        return null;
-      }
+async function fetchOptionsData(symbol) {
+  try {
+    const response = await fetch(`${apiBaseUrl}?symbol=${symbol}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      if (data.optionChain && data.optionChain.result && data.optionChain.result[0].options) {
+        return data.optionChain.result[0].options[0];
+      } else {
+        throw new Error('Invalid options data structure');
+      }
+    } else {
+      throw new Error('Response is not valid JSON');
+    }
+  } catch (error) {
+    console.error('Error fetching options data:', error);
+    alert('Failed to load options data. Please try again later.');
+    return null;
+  }
+}
     // Populate options table
     async function populateOptionsTable() {
       const optionsData = await fetchOptionsData('MSTR');
