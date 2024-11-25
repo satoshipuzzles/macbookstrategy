@@ -52,12 +52,12 @@ export default function OptionsTable({ optionsData, setSelectedOption }) {
             >
               <Td>{option.details.strike_price}</Td>
               <Td>
-                {option.last_trade ? option.last_trade.price.toFixed(2) : 'N/A'}
+                {option.last_trade
+                  ? option.last_trade.price.toFixed(2)
+                  : 'N/A'}
               </Td>
               <Td>
-                {option.day
-                  ? option.day.change.toFixed(2)
-                  : 'N/A'}
+                {option.day ? option.day.change.toFixed(2) : 'N/A'}
               </Td>
               <Td>{option.day ? option.day.volume : 'N/A'}</Td>
               <Td>{option.open_interest || 'N/A'}</Td>
