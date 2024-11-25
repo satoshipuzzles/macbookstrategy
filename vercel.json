@@ -1,8 +1,5 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/options.js"
-    }
-  ]
+  "env": {
+    "NEXT_PUBLIC_POLYGON_API_KEY": "@polygon_api_key"
+  }
 }
