@@ -1,5 +1,13 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts';
 import styled from 'styled-components';
 
 const ChartContainer = styled.div`
@@ -11,9 +19,19 @@ const ChartContainer = styled.div`
 export default function Chart({ option, stockPrice }) {
   const data = [];
 
-  for (let price = stockPrice * 0.5; price <= stockPrice * 1.5; price += stockPrice * 0.05) {
+  const optionPrice = option.last_trade
+    ? option.last_trade.price
+    : option.greeks
+    ? option.greeks.delta * stockPrice
+    : 0;
+
+  for (
+    let price = stockPrice * 0.5;
+    price <= stockPrice * 1.5;
+    price += stockPrice * 0.05
+  ) {
     const intrinsicValue = Math.max(price - option.details.strike_price, 0);
-    const profit = intrinsicValue - (option.last_trade ? option.last_trade.price : 0);
+    const profit = intrinsicValue - optionPrice;
     data.push({ price: price.toFixed(2), profit: profit.toFixed(2) });
   }
 
@@ -24,7 +42,13 @@ export default function Chart({ option, stockPrice }) {
           <XAxis dataKey="price" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="profit" stroke="#bb86fc" dot={false} />
+          <ReferenceLine x={stockPrice} stroke="red" label="Current Price" />
+          <Line
+            type="monotone"
+            dataKey="profit"
+            stroke="#bb86fc"
+            dot={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>
