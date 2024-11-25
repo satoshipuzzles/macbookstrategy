@@ -1,3 +1,4 @@
+// pages/index.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
@@ -24,11 +25,22 @@ export default function Home() {
   const fetchOptionsData = async () => {
     try {
       const response = await axios.get(
-        `https://api.polygon.io/v3/snapshot/options/MSTR?expiration_date=${expirationDate}&contract_type=call&limit=1000&apiKey=${process.env.NEXT_PUBLIC_POLYGON_API_KEY}`
+        `https://api.polygon.io/v3/snapshot/options/MSTR`,
+        {
+          params: {
+            expiration_date: expirationDate,
+            contract_type: 'call',
+            limit: 1000,
+            apiKey: process.env.NEXT_PUBLIC_POLYGON_API_KEY,
+          },
+        }
       );
       setOptionsData(response.data.results || []);
     } catch (error) {
       console.error('Error fetching options data:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+      }
     }
   };
 
