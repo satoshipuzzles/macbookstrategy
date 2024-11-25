@@ -4,16 +4,7 @@ import Header from '../components/Header';
 import OptionsTable from '../components/OptionsTable';
 import Chart from '../components/Chart';
 import GreeksInfo from '../components/GreeksInfo';
-import styled, { ThemeProvider } from 'styled-components';
-
-const theme = {
-  colors: {
-    background: '#121212',
-    text: '#ffffff',
-    primary: '#bb86fc',
-    secondary: '#03dac6',
-  },
-};
+import styled from 'styled-components';
 
 const Container = styled.div`
   padding: 20px;
@@ -42,25 +33,23 @@ export default function Home() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container>
-        <Header
-          stockPrice={stockPrice}
-          setStockPrice={setStockPrice}
-          expirationDate={expirationDate}
-          setExpirationDate={setExpirationDate}
-        />
-        <OptionsTable
-          optionsData={optionsData}
-          setSelectedOption={setSelectedOption}
-        />
-        {selectedOption && (
-          <>
-            <Chart option={selectedOption} stockPrice={stockPrice} />
-            <GreeksInfo option={selectedOption} />
-          </>
-        )}
-      </Container>
-    </ThemeProvider>
+    <Container>
+      <Header
+        stockPrice={stockPrice}
+        setStockPrice={setStockPrice}
+        expirationDate={expirationDate}
+        setExpirationDate={setExpirationDate}
+      />
+      <OptionsTable
+        optionsData={optionsData}
+        setSelectedOption={setSelectedOption}
+      />
+      {selectedOption && (
+        <>
+          <Chart option={selectedOption} stockPrice={stockPrice} />
+          <GreeksInfo option={selectedOption} />
+        </>
+      )}
+    </Container>
   );
 }
