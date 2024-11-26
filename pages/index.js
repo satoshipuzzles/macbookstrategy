@@ -14,7 +14,7 @@ const Container = styled.div`
 
 export default function Home() {
   const [stockPrice, setStockPrice] = useState(600);
-  const [expirationDate, setExpirationDate] = useState('2024-12-20');
+  const [expirationDate, setExpirationDate] = useState('2023-12-15');
   const [optionsData, setOptionsData] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
 
@@ -24,18 +24,45 @@ export default function Home() {
 
   const fetchOptionsData = async () => {
     try {
+      // Fetch options chain data from Finnhub.io
       const response = await axios.get(
-        `https://api.polygon.io/v3/snapshot/options/MSTR`,
+        `https://finnhub.io/api/v1/stock/option-chain`,
         {
           params: {
-            expiration_date: expirationDate,
-            contract_type: 'call',
-            limit: 1000,
-            apiKey: process.env.NEXT_PUBLIC_POLYGON_API_KEY,
+            symbol: 'MSTR',
+            date: expirationDate,
+            token: process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
           },
         }
       );
-      setOptionsData(response.data.results || []);
+
+      // Extract call options
+      const options = response.data.calls || [];
+
+      // Map data to match your application's requirements
+      const mappedOptions = options.map((option) => ({
+        details: {
+          ticker: option.symbol,
+          strike_price: option.strike,
+        },
+        last_trade: {
+          price: option.lastPrice,
+        },
+        day: {
+          change: option.change,
+          volume: option.volume,
+        },
+        open_interest: option.openInterest,
+        greeks: {
+          delta: option.delta,
+          gamma: option.gamma,
+          theta: option.theta,
+          vega: option.vega,
+        },
+        implied_volatility: option.impliedVolatility,
+      }));
+
+      setOptionsData(mappedOptions);
     } catch (error) {
       console.error('Error fetching options data:', error);
       if (error.response) {
