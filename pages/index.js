@@ -13,7 +13,7 @@ const Container = styled.div`
 `;
 
 export default function Home() {
-  const [stockPrice, setStockPrice] = useState(403.45); // Default to MSTR's price
+  const [stockPrice, setStockPrice] = useState(403.45); // Default stock price
   const [expirationDate, setExpirationDate] = useState('');
   const [availableDates, setAvailableDates] = useState([]);
   const [optionsData, setOptionsData] = useState([]);
@@ -31,17 +31,9 @@ export default function Home() {
 
   const fetchExpirationDates = async () => {
     try {
-      const response = await axios.get(
-        `https://finnhub.io/api/v1/stock/option_chain`,
-        {
-          params: {
-            symbol: 'MSTR',
-            token: process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
-          },
-        }
-      );
+      const response = await axios.get('/api/expiration-dates');
 
-      const dates = Object.keys(response.data.data);
+      const dates = response.data;
       setAvailableDates(dates);
 
       // Set the first available expiration date if none is selected
@@ -58,24 +50,11 @@ export default function Home() {
 
   const fetchOptionsData = async () => {
     try {
-      const response = await axios.get(
-        `https://finnhub.io/api/v1/stock/option_chain`,
-        {
-          params: {
-            symbol: 'MSTR',
-            token: process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
-          },
-        }
-      );
+      const response = await axios.get('/api/options', {
+        params: { expirationDate },
+      });
 
-      const optionsDataForDate = response.data.data[expirationDate];
-      if (!optionsDataForDate || !optionsDataForDate.CALL) {
-        console.warn('No options data available for this date.');
-        setOptionsData([]);
-        return;
-      }
-
-      const options = optionsDataForDate.CALL;
+      const options = response.data;
 
       // Map data to match your application's requirements
       const mappedOptions = options.map((option) => ({
