@@ -27,7 +27,7 @@ export default function GreeksInfo({ option }) {
           <GreekItem>Theta: {greeks.theta.toFixed(4)}</GreekItem>
           <GreekItem>Vega: {greeks.vega.toFixed(4)}</GreekItem>
           <GreekItem>
-            Implied Volatility: {(option.implied_volatility * 100).toFixed(2)}%
+            Implied Volatility: {(option.implied_volatility).toFixed(2)}%
           </GreekItem>
         </GreeksList>
       ) : (
