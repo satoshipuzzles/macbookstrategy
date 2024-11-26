@@ -13,7 +13,7 @@ const Container = styled.div`
 `;
 
 export default function Home() {
-  const [stockPrice, setStockPrice] = useState(403.45); // Set default to lastTradePrice
+  const [stockPrice, setStockPrice] = useState(403.45); // Default to MSTR's price
   const [expirationDate, setExpirationDate] = useState('');
   const [availableDates, setAvailableDates] = useState([]);
   const [optionsData, setOptionsData] = useState([]);
@@ -32,19 +32,18 @@ export default function Home() {
   const fetchExpirationDates = async () => {
     try {
       const response = await axios.get(
-        `https://eodhistoricaldata.com/api/options/MSTR.US`, // Note the '.US' suffix
+        `https://finnhub.io/api/v1/stock/option_chain`,
         {
           params: {
-            api_token: process.env.NEXT_PUBLIC_EOD_API_KEY,
-            fmt: 'json',
+            symbol: 'MSTR',
+            token: process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
           },
         }
       );
 
-      const allData = response.data.data || [];
-      const dates = allData.map((item) => item.expirationDate);
-
+      const dates = Object.keys(response.data.data);
       setAvailableDates(dates);
+
       // Set the first available expiration date if none is selected
       if (!expirationDate && dates.length > 0) {
         setExpirationDate(dates[0]);
@@ -60,37 +59,28 @@ export default function Home() {
   const fetchOptionsData = async () => {
     try {
       const response = await axios.get(
-        `https://eodhistoricaldata.com/api/options/MSTR.US`, // Note the '.US' suffix
+        `https://finnhub.io/api/v1/stock/option_chain`,
         {
           params: {
-            api_token: process.env.NEXT_PUBLIC_EOD_API_KEY,
-            fmt: 'json',
+            symbol: 'MSTR',
+            token: process.env.NEXT_PUBLIC_FINNHUB_API_KEY,
           },
         }
       );
 
-      const allData = response.data.data || [];
-      // Find the data for the selected expiration date
-      const expirationData = allData.find(
-        (item) => item.expirationDate === expirationDate
-      );
-
-      if (
-        !expirationData ||
-        !expirationData.options ||
-        !expirationData.options.CALL
-      ) {
+      const optionsDataForDate = response.data.data[expirationDate];
+      if (!optionsDataForDate || !optionsDataForDate.CALL) {
         console.warn('No options data available for this date.');
         setOptionsData([]);
         return;
       }
 
-      const options = expirationData.options.CALL;
+      const options = optionsDataForDate.CALL;
 
       // Map data to match your application's requirements
       const mappedOptions = options.map((option) => ({
         details: {
-          ticker: option.contractName,
+          ticker: option.symbol,
           strike_price: option.strike,
         },
         last_trade: {
