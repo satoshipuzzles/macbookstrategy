@@ -26,11 +26,20 @@ const Input = styled.input`
   border-radius: 4px;
 `;
 
+const Select = styled.select`
+  background-color: #1e1e1e;
+  border: none;
+  color: #ffffff;
+  padding: 5px;
+  border-radius: 4px;
+`;
+
 export default function Header({
   stockPrice,
   setStockPrice,
   expirationDate,
   setExpirationDate,
+  availableDates,
 }) {
   return (
     <HeaderContainer>
@@ -45,11 +54,16 @@ export default function Header({
       </InputGroup>
       <InputGroup>
         <Label>Expiration Date:</Label>
-        <Input
-          type="date"
+        <Select
           value={expirationDate}
           onChange={(e) => setExpirationDate(e.target.value)}
-        />
+        >
+          {availableDates.map((date) => (
+            <option key={date} value={date}>
+              {date}
+            </option>
+          ))}
+        </Select>
       </InputGroup>
     </HeaderContainer>
   );
